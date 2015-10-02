@@ -36,15 +36,15 @@ class Bookmark(models.Model):
     public = PublicBookmarkManager()
 
     #this is metadata for the tag and how it is stored
-    class Mets:
+    class Meta:
         verbose_name = "bookmark"
         verbose_name_plural = "bookmarks"
         ordering = ["date_created"]
     #what the column dislay name will be eg value stored in title and concat it with the url,
     #thus the name of the bookmark and url of the bookmark
     def __str__(self):
-        return '%s (%s)', (self.title, self.url)
-
+        return '%s (%s)' % (self.title, self.url)
+    #save the url a fresh if one doesnt exist else call save from bookmark
     def save(self, *args, **kwargs):
         if not self.id:
             self.date_created = now()
