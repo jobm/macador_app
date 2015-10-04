@@ -2,7 +2,7 @@
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect, render
 # Create your views here
-
+from .models import Bookmark
 #request a user
 def bookmark_list(request):
     #select all bookmarks
