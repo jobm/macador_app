@@ -1,8 +1,10 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 # Create your models here.
 #this is the tag model that contains the mapping to the table Tag in the database
+@python_2_unicode_compatible
 class Tag(models.Model):
     name = models.CharField(max_length=200,unique=True)
     #this is metadata for the tag and how it is stored
@@ -19,6 +21,7 @@ class PublicBookmarkManager(models.Manager):
         qs = super(PublicBookmarkManager, self).get_queryset()
         return qs.filter(is_public=True)
 #this is the bookmark model containing the mapping date to the table Bookmark in the database
+@python_2_unicode_compatible
 class Bookmark(models.Model):
     url = models.URLField()
     title = models.CharField('title', max_length = 255)
