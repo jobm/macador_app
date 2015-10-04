@@ -5,6 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 # Create your views here
 from .models import Bookmark
+from .forms import BookmarkForm
 #request a user
 def bookmark_list(request):
     #select all bookmarks
@@ -14,7 +15,7 @@ def bookmark_list(request):
     # render the request
     return render(request, 'marcador/bookmark_list.html', context)
 
-# request for user specific bookmarks
+# request for user spejob/cific bookmarks
 @login_required
 def bookmark_user(request, username):
     # GET the user and the name
@@ -30,3 +31,37 @@ def bookmark_user(request, username):
     context = {'bookmarks': bookmarks, 'owner': user}
     # retun the view
     return render(request, 'marcador/bookmark_user.html', context)
+
+@login_required
+def bookmark_create(request):
+    if request.method == 'POST':
+        form = BookmarkForm(data=request.POST)
+        if form.is_valid():
+            bookmark = form.save(commit=False)
+            bookmark.owner = request.user
+            bookmark.save()
+            form.save_m2m()
+            return redirect('marcador_bookmark_user',
+                username=request.user.username)
+    else:
+        form = BookmarkForm()
+    context = {'form': form, 'create': True}
+    return render(request, 'marcador/form.html', context)
+
+
+
+@login_required
+def bookmark_edit(request, pk):
+    bookmark = get_object_or_404(Bookmark, pk=pk)
+    if bookmark.owner != request.user and not request.user.is_superuser:
+        raise PermissionDenied
+    if request.method == 'POST':
+        form = BookmarkForm(instance=bookmark, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('marcador_bookmark_user',
+                username=request.user.username)
+    else:
+        form = BookmarkForm(instance=bookmark)
+    context = {'form': form, 'create': False}
+    return render(request, 'marcador/form.html', context)
